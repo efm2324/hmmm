@@ -47,6 +47,10 @@
         "chapter": 172.0,
         "category": "Manga"
     },
+    "Banished from the Hero’s Party, I Decided to Live a Quiet Life in the Countryside": {
+        "chapter": 72.0,
+        "category": "Manga"
+    },
     "Belle puppée's Engagement": {
         "chapter": 8.0,
         "category": "Manga"
@@ -184,7 +188,7 @@
         "category": "Manga"
     },
     "Isekai Apocalypse Mynoghra The Conquest of the World Starts With the Civilization of Ruin": {
-        "chapter": 30.0,
+        "chapter": 31.0,
         "category": "Manga"
     },
     "Isekai Kenkokuki": {
@@ -213,6 +217,10 @@
     },
     "Kaiju No. 8": {
         "chapter": 129.0,
+        "category": "Manga"
+    },
+    "Kaiko sareta Ankoku Heishi (30-dai) no Slow na Second Life": {
+        "chapter": 70.0,
         "category": "Manga"
     },
     "Kekkaishi e no Tensei": {
@@ -520,7 +528,7 @@
         "category": "Manhwa"
     },
     "Absolute sword sense": {
-        "chapter": 152.0,
+        "chapter": 159.0,
         "category": "Manhwa"
     },
     "Academy's Genius Swordmaster": {
@@ -588,7 +596,7 @@
         "category": "Manhwa"
     },
     "Black Corporation: Joseon": {
-        "chapter": 71.0,
+        "chapter": 119.0,
         "category": "Manhwa"
     },
     "Bowblade Spirit": {
@@ -599,12 +607,20 @@
         "chapter": 63.0,
         "category": "Manhwa"
     },
+    "Childhood Friend of the Zenith": {
+        "chapter": 83.0,
+        "category": "Manhwa"
+    },
     "Chronicles of a Doomed Prodigy": {
         "chapter": 54.0,
         "category": "Manhwa"
     },
     "Chronicles of the Demon Faction": {
         "chapter": 9.0,
+        "category": "Manhwa"
+    },
+    "Chronicles of the Lazy Sovereing": {
+        "chapter": 23.0,
         "category": "Manhwa"
     },
     "Chronicles of the marial gods return": {
@@ -651,6 +667,10 @@
         "chapter": 44.0,
         "category": "Manhwa"
     },
+    "Doctor’s Rebirth": {
+        "chapter": 215.0,
+        "category": "Manhwa"
+    },
     "Dr player": {
         "chapter": 65.0,
         "category": "Manhwa"
@@ -663,6 +683,10 @@
         "chapter": 48.0,
         "category": "Manhwa"
     },
+    "Dukedom’s Legendary Prodigy": {
+        "chapter": 22.0,
+        "category": "Manhwa"
+    },
     "Duke pendragon": {
         "chapter": 120.0,
         "category": "Manhwa"
@@ -672,7 +696,7 @@
         "category": "Manhwa"
     },
     "Eleceed": {
-        "chapter": 369.0,
+        "chapter": 374.0,
         "category": "Manhwa"
     },
     "Enrolling in the Transcendent Academy": {
@@ -680,7 +704,7 @@
         "category": "Manhwa"
     },
     "Eternally regressing knight": {
-        "chapter": 76.0,
+        "chapter": 84.0,
         "category": "Manhwa"
     },
     "Everyone else is a returnee": {
@@ -700,7 +724,7 @@
         "category": "Manhwa"
     },
     "Fated to Be Loved by Villains": {
-        "chapter": 34.0,
+        "chapter": 45.0,
         "category": "Manhwa"
     },
     "Fff class trashhero": {
@@ -740,7 +764,7 @@
         "category": "Manhwa"
     },
     "Helmut the forsaken child": {
-        "chapter": 77.0,
+        "chapter": 112.0,
         "category": "Manhwa"
     },
     "Hero has returned": {
@@ -868,15 +892,11 @@
         "category": "Manhwa"
     },
     "Life of a magic academy mage": {
-        "chapter": 121.0,
+        "chapter": 131.0,
         "category": "Manhwa"
     },
     "Limit Breaker": {
         "chapter": 122.0,
-        "category": "Manhwa"
-    },
-    "Login Murim": {
-        "chapter": 237.0,
         "category": "Manhwa"
     },
     "Lord Hero of House Remes": {
@@ -884,7 +904,7 @@
         "category": "Manhwa"
     },
     "Magic Academy's Genius Blinker": {
-        "chapter": 71.0,
+        "chapter": 78.0,
         "category": "Manhwa"
     },
     "Manager Kim": {
@@ -912,7 +932,11 @@
         "category": "Manhwa"
     },
     "Mercenary Enrollment": {
-        "chapter": 257.0,
+        "chapter": 265.0,
+        "category": "Manhwa"
+    },
+    "Murim Login": {
+        "chapter": 242.0,
         "category": "Manhwa"
     },
     "Muscle Joseon": {
@@ -943,8 +967,12 @@
         "chapter": 71.0,
         "category": "Manhwa"
     },
+    "My Wife is the Demonic Cult Leader": {
+        "chapter": 41.0,
+        "category": "Manhwa"
+    },
     "Nanomachine": {
-        "chapter": 277.0,
+        "chapter": 288.0,
         "category": "Manhwa"
     },
     "Nine heavens swordmaster": {
@@ -1028,7 +1056,7 @@
         "category": "Manhwa"
     },
     "Regressor of the fallen family": {
-        "chapter": 100.0,
+        "chapter": 110.0,
         "category": "Manhwa"
     },
     "Reincarnation of the Hero Party's Grand Mage": {
@@ -1056,7 +1084,7 @@
         "category": "Manhwa"
     },
     "Return of the crazy demon": {
-        "chapter": 122.0,
+        "chapter": 179.0,
         "category": "Manhwa"
     },
     "Return of the disaster class hero": {
@@ -1080,7 +1108,7 @@
         "category": "Manhwa"
     },
     "Revenge of the iron blooded sword hound": {
-        "chapter": 131.0,
+        "chapter": 140.0,
         "category": "Manhwa"
     },
     "Rooftop sword master": {
@@ -1105,10 +1133,6 @@
     },
     "Seoul station necromancer": {
         "chapter": 121.0,
-        "category": "Manhwa"
-    },
-    "Shadow of the Supreme": {
-        "chapter": 63.0,
         "category": "Manhwa"
     },
     "Skeleton soldier couldn't protect the dungeon": {
@@ -1144,7 +1168,7 @@
         "category": "Manhwa"
     },
     "Surviving genius on borrowed time": {
-        "chapter": 54.0,
+        "chapter": 63.0,
         "category": "Manhwa"
     },
     "Surviving the Apocalypse": {
@@ -1224,19 +1248,23 @@
         "category": "Manhwa"
     },
     "The Greatest Estate Developer": {
-        "chapter": 210.0,
+        "chapter": 217.0,
         "category": "Manhwa"
     },
     "The Heir": {
         "chapter": 7.0,
         "category": "Manhwa"
     },
-    "The Heavenly Demon Lord Who Doesn't Want to Level Up": {
-        "chapter": 21.0,
+    "The heavenly demon can’t live a normal life": {
+        "chapter": 177.0,
         "category": "Manhwa"
     },
     "The heavenly demon destroys the lich kings murim": {
         "chapter": 61.0,
+        "category": "Manhwa"
+    },
+    "The Heavenly Demon Lord Who Doesn't Want to Level Up": {
+        "chapter": 21.0,
         "category": "Manhwa"
     },
     "The Horizon": {
@@ -1287,16 +1315,12 @@
         "chapter": 53.0,
         "category": "Manhwa"
     },
-    "The Regressed Mercenary Has a Plan": {
-        "chapter": 56.0,
-        "category": "Manhwa"
-    },
     "The regressed mercenarys machinations": {
-        "chapter": 56.0,
+        "chapter": 65.0,
         "category": "Manhwa"
     },
     "The regressed son of a duke is an assassin": {
-        "chapter": 90.0,
+        "chapter": 102.0,
         "category": "Manhwa"
     },
     "The Reincarnated Assassin Is a Swordmaster": {
@@ -1492,7 +1516,7 @@
         "category": "Manhua"
     },
     "Invincible After Shocking My Empress Wife": {
-        "chapter": 84.0,
+        "chapter": 103.0,
         "category": "Manhua"
     },
     "Invincible Martial Sage": {
@@ -1516,7 +1540,7 @@
         "category": "Manhua"
     },
     "Login 10000 years into the future": {
-        "chapter": 257.0,
+        "chapter": 273.0,
         "category": "Manhua"
     },
     "Martial Evolution: Start by Awakening the King of Monsters": {
@@ -1572,7 +1596,7 @@
         "category": "Manhua"
     },
     "Necromancer the ultimate scourge": {
-        "chapter": 216.0,
+        "chapter": 231.0,
         "category": "Manhua"
     },
     "Please Slay The Demon! Young Master!": {
@@ -1608,7 +1632,7 @@
         "category": "Manhua"
     },
     "Shut Up, Evil Dragon! I Don't Want to Raise a Child With You Anymore": {
-        "chapter": 50.0,
+        "chapter": 69.0,
         "category": "Manhua"
     },
     "Skeleton Evolution: Starting From Being Summoned By the Sorceress": {
@@ -1671,16 +1695,12 @@
         "chapter": 72.0,
         "category": "Manhua"
     },
-    "The heavenly demon can’t live a normal life": {
-        "chapter": 164.0,
-        "category": "Manhua"
-    },
     "When Am I Invincible": {
         "chapter": 276.0,
         "category": "Manhua"
     },
     "Your talent is mine": {
-        "chapter": 103.0,
+        "chapter": 106.0,
         "category": "Manhua"
     },
     "A Spell for a Smith": {
