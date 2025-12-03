@@ -1,6 +1,6 @@
 import json
 import os
-import sys # Import sys for clean exiting
+import sys
 
 # Define the name of the file where data will be stored
 DATA_FILE = 'List.json'
@@ -24,10 +24,10 @@ def load_series_data(filepath=DATA_FILE):
             data = json.load(f)
             return data
     except json.JSONDecodeError:
-        print(f"Error reading JSON from [{filepath}]. The file might be corrupted. Returning empty data.")
+        print(f"[ERROR] Error reading JSON from [{filepath}]. The file might be corrupted. Returning empty data.")
         return {}
     except Exception as e:
-        print(f"An unexpected error occurred while loading data: {e}")
+        print(f"[ERROR] An unexpected error occurred while loading data: {e}")
         return {}
 
 def save_series_data(data, filepath=DATA_FILE):
@@ -52,20 +52,23 @@ def update_series_chapter(series_name, chapter_number, category, series_data):
         print(f"[ERROR] Invalid category '{category}'. Must be one of: {', '.join(CATEGORIES)}. Update cancelled.")
         return False
 
-    # --- Chapter Validation ---
+    # --- Chapter Validation (Float) ---
     try:
-        chapter_number = int(chapter_number)
+        # CHANGE: Use float() instead of int()
+        chapter_number = float(chapter_number)
         if chapter_number < 0:
             print("[ERROR] Chapter number cannot be negative. Update cancelled.")
             return False
     except ValueError:
-        print("[ERROR] Invalid chapter number provided. It must be an integer. Update cancelled.")
+        print("[ERROR] Invalid chapter number provided. It must be a number (e.g., 10 or 10.5). Update cancelled.")
         return False
 
     # 2. Prepare update variables and check if the series exists
     is_new = series_name not in series_data
-    old_data = series_data.get(series_name, {"chapter": 0, "category": category})
-    old_chapter = old_data.get("chapter", 0)
+    old_data = series_data.get(series_name, {"chapter": 0.0, "category": category})
+    
+    # Ensure old chapter is treated as float for comparison
+    old_chapter = float(old_data.get("chapter", 0.0))
     old_category = old_data.get("category", category)
     
     # 3. Update the data using the new nested structure
@@ -106,8 +109,10 @@ def view_all_series(data):
     print("\n--- Current Series Tracker Status (Sorted A-Z) ---")
     # Sort series alphabetically by name
     for series, info in sorted(data.items()):
-        chapter = info.get("chapter", "N/A")
+        # Retrieve chapter and ensure it displays nicely
+        chapter = info.get("chapter", 0)
         category = info.get("category", "Uncategorized")
+        
         # Use ljust for clean alignment
         print(f"[{category.ljust(6)}] {series.ljust(30)} | Chapter {chapter}")
     print("--------------------------------------------------\n")
@@ -119,17 +124,19 @@ def handle_add_series(data):
     Displays the list automatically on success.
     """
     print("\n--- Add New Series ---")
+    
+    # 1. Input Category (first selection)
+    print(f"Available Categories: {', '.join(CATEGORIES)}")
+    category = input("Enter Category: ").strip()
+
+    # 2. Input Series Name
     series_name = input("Enter Series Name: ").strip()
     if not series_name:
         print("[NOTE] Series name cannot be empty.")
         return False
-    
-    # Input Chapter
-    chapter_number = input("Enter Current Chapter: ").strip()
-    
-    # Input Category
-    print(f"Available Categories: {', '.join(CATEGORIES)}")
-    category = input("Enter Category: ").strip()
+
+    # 3. Input Chapter (Float accepted)
+    chapter_number = input("Enter Current Chapter (e.g. 12 or 12.5): ").strip()
     
     # Use the core function
     if update_series_chapter(series_name, chapter_number, category, data):
