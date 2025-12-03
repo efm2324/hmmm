@@ -8,6 +8,7 @@ SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_FILE = os.path.join(SCRIPT_DIR, 'List.json')
 
 # Define the allowed categories for tracking series
+# This list is now used to define the display order for Option 2.
 CATEGORIES = ['Manga', 'Manhwa', 'Manhua', 'Other']
 
 def load_series_data(filepath=DATA_FILE):
@@ -40,9 +41,6 @@ def save_series_data(data, filepath=DATA_FILE):
         with open(filepath, 'w', encoding='utf-8') as f:
             # Use indent=4 for human-readable formatting
             json.dump(data, f, indent=4, ensure_ascii=False)
-        # We suppress the "Data successfully saved" message in update_series_chapter 
-        # to avoid spamming the console on every small update, but keep it here.
-        # print(f"\n[INFO] Data successfully saved to [{filepath}].")
     except Exception as e:
         print(f"[ERROR] An error occurred while saving data: {e}")
 
@@ -106,45 +104,69 @@ def update_series_chapter(series_name, chapter_number, category, series_data, au
 
 def view_all_series(data):
     """
-    Prints all tracked series and their current chapters, including the category.
-    The list is sorted alphabetically by series name.
+    Prints all tracked series, grouped by category and sorted alphabetically by name.
     """
     if not data:
         print("\nSeries Tracker is currently empty.")
         return
 
-    print("\n--- Current Series Tracker Status (Sorted A-Z) ---")
-    # Sort series alphabetically by name
-    for series, info in sorted(data.items()):
-        # Retrieve chapter and ensure it displays nicely
-        chapter = info.get("chapter", 0)
-        category = info.get("category", "Uncategorized")
+    # 1. Group series by category
+    grouped_data = {cat: {} for cat in CATEGORIES}
+    
+    # Populate the grouped dictionary
+    for series_name, info in data.items():
+        category = info.get("category", "Other")
+        # Ensure 'Other' captures entries with missing or invalid categories
+        if category not in CATEGORIES:
+            category = "Other"
+            
+        grouped_data[category][series_name] = info
+
+    print("\n--- Current Series Tracker Status (Grouped by Category) ---")
+    
+    # 2. Iterate through categories in defined order (CATEGORIES list)
+    for category_name in CATEGORIES:
+        series_in_category = grouped_data[category_name]
         
-        # Use ljust for clean alignment
-        print(f"[{category.ljust(6)}] {series.ljust(30)} | Chapter {chapter}")
-    print("--------------------------------------------------\n")
+        # Only print the category header if it contains series
+        if series_in_category:
+            print(f"\n[{'=' * 5} {category_name.upper()} {'=' * 5}]")
+            
+            # 3. Sort series alphabetically within the category and print
+            for series, info in sorted(series_in_category.items()):
+                chapter = info.get("chapter", 0)
+                # Use ljust for clean alignment
+                print(f"  {series.ljust(30)} | Chapter {chapter}")
+                
+    print("\n----------------------------------------------------------\n")
 
 
-def handle_add_series(data):
+def handle_add_new_series_only(data):
     """
-    Handles the full flow for adding a new series.
-    Displays the list automatically on success.
+    Handles the flow for strictly adding a new series.
+    It prevents updating existing series, guiding the user to Option 3 for that.
     """
     print("\n--- Add New Series ---")
     
-    # 1. Input Category (first selection)
-    print(f"Available Categories: {', '.join(CATEGORIES)}")
-    category = input("Enter Category: ").strip()
-
-    # 2. Input Series Name
+    # 1. Input Series Name (Used for lookup)
     series_name = input("Enter Series Name: ").strip()
     if not series_name:
         print("[NOTE] Series name cannot be empty.")
         return False
 
-    # 3. Input Chapter (Float accepted)
-    chapter_number = input("Enter Current Chapter (e.g. 12 or 12.5): ").strip()
+    # Check if series already exists
+    if series_name in data:
+        print(f"\n[ERROR] Series '{series_name}' already exists.")
+        print("Please use Option 3 ('Find & Check Status') to update an existing series.")
+        return False
+        
+    # 2. Input Category (must be provided for new series)
+    print(f"\nAvailable Categories: {', '.join(CATEGORIES)}")
+    category = input("Enter Category: ").strip()
     
+    # 3. Input Chapter
+    chapter_number = input("Enter Current Chapter: ").strip()
+
     # Use the core function
     if update_series_chapter(series_name, chapter_number, category, data):
         # Automatically display the updated list
@@ -152,34 +174,8 @@ def handle_add_series(data):
         return True
     return False
 
+# The previous handle_add_or_update_series is now replaced by handle_add_new_series_only.
 
-def handle_update_chapter(data):
-    """
-    Handles the flow for updating chapter progress for an existing series.
-    Displays the list automatically on success.
-    """
-    print("\n--- Quick Chapter Update ---")
-    series_name = input("Enter Series Name to Update: ").strip()
-    
-    if series_name not in data:
-        print(f"[ERROR] Series '{series_name}' not found in tracker.")
-        print("Please use option 1 ('Add/Update Series') to track it first, or check your spelling.")
-        return False
-        
-    # Get existing category to pass to the update function
-    existing_category = data[series_name]["category"]
-    
-    # Input Chapter
-    chapter_number = input(f"Enter New Chapter Number (Current: {data[series_name]['chapter']}): ").strip()
-
-    # Use the core function (the category remains the existing one)
-    if update_series_chapter(series_name, chapter_number, existing_category, data):
-        # Automatically display the updated list
-        view_all_series(data)
-        return True
-    return False
-
-# --- NEW FUNCTION FOR FINDING AND OPTIONALLY UPDATING A SERIES ---
 def handle_find_series(data):
     """
     Allows the user to find a series, view its status, and choose to update it.
@@ -260,31 +256,27 @@ def main_menu():
         print("\n===============================")
         print(" Series Tracker Command Menu ")
         print("===============================")
-        print("1. Add/Update Series (requires Category)")
-        print("2. Quick Chapter Update (existing Series)")
-        print("3. View All Tracked Series")
-        print("4. Find & Check Status of a Series")
-        print("5. Exit and Save") # Option changed from 4 to 5
+        print("1. Add New Series")
+        print("2. View All Tracked Series")
+        print("3. Find & Check Status of a Series")
+        print("4. Exit and Save")
         print("===============================")
         
-        choice = input("Enter your choice (1-5): ").strip()
+        choice = input("Enter your choice (1-4): ").strip()
 
         if choice == '1':
-            handle_add_series(series_data)
+            handle_add_new_series_only(series_data)
         elif choice == '2':
-            handle_update_chapter(series_data)
-        elif choice == '3':
             view_all_series(series_data)
-        elif choice == '4':
+        elif choice == '3':
             handle_find_series(series_data)
-        elif choice == '5': # Option changed from 4 to 5
+        elif choice == '4': 
             print("\nExiting tracker. Saving final data...")
-            # We call save here one last time in case the update function was modified 
-            # to not save automatically, ensuring exit persistence.
+            # Ensure final save before exit
             save_series_data(series_data)
             sys.exit(0)
         else:
-            print("\n[WARNING] Invalid choice. Please enter a number between 1 and 5.")
+            print("\n[WARNING] Invalid choice. Please enter a number between 1 and 4.")
 
 if __name__ == "__main__":
     main_menu()
