@@ -1,0 +1,133 @@
+import random
+import time
+
+# Card Setup
+suits = {'Hearts': '♥', 'Diamonds': '♦', 'Spades': '♠', 'Clubs': '♣'}
+ranks = ('2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A')
+values = {'2':2, '3':3, '4':4, '5':5, '6':6, '7':7, '8':8, '9':9, '10':10, 'J':10, 'Q':10, 'K':10, 'A':11}
+
+class Card:
+    def __init__(self, suit, rank):
+        self.suit = suit
+        self.rank = rank
+        self.symbol = suits[suit]
+    
+    def __str__(self):
+        return f"{self.rank} of {self.suit}"
+
+# --- ASCII CARD DRAWING ENGINE ---
+def draw_cards(cards, hide_first=False):
+    """
+    Renders a list of card objects as ASCII art side-by-side.
+    """
+    lines = ["" for _ in range(7)] # Cards are 7 lines high
+    
+    for i, card in enumerate(cards):
+        if hide_first and i == 0:
+            # Drawing the back of a card
+            lines[0] += " ┌─────────┐ "
+            lines[1] += " │░░░░░░░░░│ "
+            lines[2] += " │░░░░░░░░░│ "
+            lines[3] += " │░░ BACK ░│ "
+            lines[4] += " │░░░░░░░░░│ "
+            lines[5] += " │░░░░░░░░░│ "
+            lines[6] += " └─────────┘ "
+        else:
+            # Drawing a face-up card
+            space = " " if card.rank != '10' else "" # Adjust for double digit '10'
+            lines[0] += " ┌─────────┐ "
+            lines[1] += f" │ {card.rank}{space}      │ "
+            lines[2] += " │         │ "
+            lines[3] += f" │    {card.symbol}    │ "
+            lines[4] += " │         │ "
+            lines[5] += f" │      {space}{card.rank} │ "
+            lines[6] += " └─────────┘ "
+
+    for line in lines:
+        print(line)
+
+class Deck:
+    def __init__(self):
+        self.deck = [Card(s, r) for s in suits for r in ranks]
+    def shuffle(self):
+        random.shuffle(self.deck)
+    def deal(self):
+        return self.deck.pop()
+
+class Hand:
+    def __init__(self):
+        self.cards = []
+        self.value = 0
+        self.aces = 0 
+    def add_card(self, card):
+        self.cards.append(card)
+        self.value += values[card.rank]
+        if card.rank == 'A': self.aces += 1
+    def adjust_for_ace(self):
+        while self.value > 21 and self.aces:
+            self.value -= 10
+            self.aces -= 1
+
+def show_some(player, dealer):
+    print("\n" + "="*40)
+    print(f"DEALER'S HAND (Showing: {values[dealer.cards[1].rank]})")
+    draw_cards(dealer.cards, hide_first=True)
+    print(f"PLAYER'S HAND (Total: {player.value})")
+    draw_cards(player.cards)
+    print("="*40)
+
+def show_all(player, dealer):
+    print("\n" + "="*40)
+    print(f"DEALER'S FINAL HAND (Total: {dealer.value})")
+    draw_cards(dealer.cards)
+    print(f"PLAYER'S FINAL HAND (Total: {player.value})")
+    draw_cards(player.cards)
+    print("="*40)
+
+# --- Main Game Loop ---
+while True:
+    print('\n' + '♣ ♦ BLACKJACK TABLE ♠ ♥'.center(40))
+    deck = Deck(); deck.shuffle()
+    player_hand = Hand(); dealer_hand = Hand()
+    
+    player_hand.add_card(deck.deal())
+    dealer_hand.add_card(deck.deal())
+    player_hand.add_card(deck.deal())
+    dealer_hand.add_card(deck.deal())
+    
+    show_some(player_hand, dealer_hand)
+    
+    playing = True
+    while playing:
+        if player_hand.value == 21: break
+        choice = input("\n(H)it or (S)tand? ").lower()
+        if choice == 'h':
+            player_hand.add_card(deck.deal())
+            player_hand.adjust_for_ace()
+            show_some(player_hand, dealer_hand)
+            if player_hand.value > 21:
+                print("\n💥 PLAYER BUSTS!")
+                playing = False
+        else:
+            playing = False
+
+    if player_hand.value <= 21:
+        print("\nDealer's turn...")
+        time.sleep(1)
+        while dealer_hand.value < 17:
+            dealer_hand.add_card(deck.deal())
+            dealer_hand.adjust_for_ace()
+            
+        show_all(player_hand, dealer_hand)
+        
+        if dealer_hand.value > 21:
+            print("\n💰 DEALER BUSTS! YOU WIN!")
+        elif dealer_hand.value > player_hand.value:
+            print("\n❌ DEALER WINS!")
+        elif dealer_hand.value < player_hand.value:
+            print("\n🏆 PLAYER WINS!")
+        else:
+            print("\n🤝 IT'S A PUSH!")
+
+    if input("\nPlay again? (y/n): ").lower() != 'y':
+        break

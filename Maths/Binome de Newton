@@ -1,0 +1,13 @@
+#Binome de Newton
+
+a = str(input("Enter first coeff with the variable: "))
+b = int(input("Enter the second part: "))
+n = int(input("Enter the power n: "))
+print(f"({a}+{b})^{n} =", end=" ")
+for i in range(n):
+    coeff = 1
+    for j in range(i):
+        coeff = coeff * (n - j) // (j + 1)
+    print(f"{coeff}*{a}^{n - i}*{b}^{i}", end="")
+    if i != n - 1:
+        print(" + ", end="")

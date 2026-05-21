@@ -1,0 +1,34 @@
+def get_electronic_configuration(num_electrons):
+    """
+    Calculates the electronic configuration for a given number of electrons.
+    """
+    shells = {
+        '1s': 2, '2s': 2, '2p': 6, '3s': 2, '3p': 6, '4s': 2, '3d': 10, '4p': 6,
+        '5s': 2, '4d': 10, '5p': 6, '6s': 2, '4f': 14, '5d': 10, '6p': 6,
+        '7s': 2, '5f': 14, '6d': 10, '7p': 6
+    }
+    
+    configuration = {}
+    remaining_electrons = num_electrons
+    
+    for orbital, capacity in shells.items():
+        if remaining_electrons == 0:
+            break
+        
+        if remaining_electrons >= capacity:
+            configuration[orbital] = capacity
+            remaining_electrons -= capacity
+        else:
+            configuration[orbital] = remaining_electrons
+            remaining_electrons = 0
+            
+    # Format the output
+    formatted_config = []
+    for orbital, count in configuration.items():
+        if count > 0:
+            formatted_config.append(f"{orbital}^{count}")
+            
+    return " ".join(formatted_config)
+
+num_e = int(input("Enter the atomic number: "))
+print(get_electronic_configuration(num_e))

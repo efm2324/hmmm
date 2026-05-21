@@ -1,0 +1,119 @@
+import random
+import time
+import os
+
+# --- Configuration ---
+ROWS, COLS = 3, 3
+symbol_value = {"💎": 100, "🔔": 50, "⭐": 20, "🍋": 10, "🍇": 5, "🍉": 3, "🍊": 2, "🍒": 1}
+symbol_count = {"💎": 1, "🔔": 2, "⭐": 3, "🍋": 5, "🍇": 8, "🍉": 12, "🍊": 15, "🍒": 20}
+
+def clear_screen():
+    # Clears terminal for a cleaner "animation" look
+    os.system('cls' if os.name == 'nt' else 'clear')
+
+def get_machine_art(r1, r2, r3):
+    """Returns the ASCII cabinet with the current reel symbols injected."""
+    return f"""
+     ________________________
+    | [][][][][][][][][][][] |
+    |      CASINO SLOTS      |
+    |________________________|
+    |      |          |      |
+    |  {r1[0]}  |   {r1[1]}     |  {r1[2]}  |
+    |      |          |      |
+    |  {r2[0]}  |   {r2[1]}     |  {r2[2]}  | <--- PAYLINE
+    |      |          |      |
+    |  {r3[0]}  |   {r3[1]}     |  {r3[2]}  |
+    |______|__________|______|
+    |       __________       |
+    |      |  BET $   |      |  (O)
+    |      |__________|      |   |
+    |________________________|  /
+    |   [ ALL-IN ]  [ SPIN ] | /
+    |________________________|/
+    """
+
+def get_slot_machine_spin():
+    all_symbols = [sym for sym, count in symbol_count.items() for _ in range(count)]
+    # Generating 3 columns
+    columns = [[random.choice(all_symbols) for _ in range(ROWS)] for _ in range(COLS)]
+    return columns
+
+def check_all_wins(grid, bet):
+    base_winnings = 0
+    winning_combos = []
+    # Rows
+    for r in range(ROWS):
+        if grid[0][r] == grid[1][r] == grid[2][r]:
+            base_winnings += bet * symbol_value[grid[0][r]]
+            winning_combos.append(f"Row {r+1}")
+    # Cols
+    for c in range(COLS):
+        if grid[c][0] == grid[c][1] == grid[c][2]:
+            base_winnings += bet * symbol_value[grid[c][0]]
+            winning_combos.append(f"Col {c+1}")
+    # Diagonals
+    if grid[0][0] == grid[1][1] == grid[2][2]:
+        base_winnings += bet * symbol_value[grid[0][0]]; winning_combos.append("Diag 1")
+    if grid[0][2] == grid[1][1] == grid[2][0]:
+        base_winnings += bet * symbol_value[grid[0][2]]; winning_combos.append("Diag 2")
+
+    mult = 1
+    if len(winning_combos) == 2: mult = 2
+    elif len(winning_combos) >= 3: mult = 5
+    
+    return base_winnings * mult, winning_combos, mult
+
+def main():
+    balance = 500
+    # Initial empty machine
+    reels = [["❓","❓","❓"], ["❓","❓","❓"], ["❓","❓","❓"]]
+    
+    while balance > 0:
+        clear_screen()
+        print(get_machine_art(reels[0], reels[1], reels[2]))
+        print(f"💰 BALANCE: ${balance}")
+        
+        user_input = input("Enter bet, 'all', or 'q': ").lower()
+        if user_input == 'q': break
+        
+        if user_input == 'all':
+            bet = balance
+        elif user_input.isdigit() and 0 < int(user_input) <= balance:
+            bet = int(user_input)
+        else:
+            print("Invalid bet!"); time.sleep(1); continue
+
+        balance -= bet
+        
+        # SPINNING ANIMATION
+        for _ in range(5):
+            temp_reels = [[random.choice(list(symbol_value.keys())) for _ in range(3)] for _ in range(3)]
+            clear_screen()
+            print(get_machine_art(temp_reels[0], temp_reels[1], temp_reels[2]))
+            print("🎰 SPINNING...")
+            time.sleep(0.2)
+
+        # FINAL RESULT
+        result = get_slot_machine_spin()
+        # Transform columns to rows for the display function
+        reels = [[result[c][r] for c in range(COLS)] for r in range(ROWS)]
+        
+        clear_screen()
+        print(get_machine_art(reels[0], reels[1], reels[2]))
+        
+        winnings, winners, mult = check_all_wins(result, bet)
+        if winnings > 0:
+            balance += winnings
+            print(f"🎉 WIN! {', '.join(winners)} hit!")
+            if mult > 1: print(f"🔥 {mult}X COMBO MULTIPLIER! 🔥")
+            print(f"WON: ${winnings}")
+        else:
+            print("💀 NO LUCK.")
+        
+        input("\nPress Enter to play again...")
+
+    print("Out of cash! Thanks for playing.")
+
+if __name__ == "__main__":
+    main()
