@@ -1,5 +1,409 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+#include <string.h>
 
-int main (){
+#define MAX_SIZE 10
+#define EPSILON 1e-10
 
+typedef struct {
+    double data[MAX_SIZE][MAX_SIZE];
+    int rows;
+    int cols;
+} Matrix;
+
+/* Utility Functions */
+void printMatrix(Matrix *m, const char *name) {
+    printf("\n%s (%dx%d):\n", name, m->rows, m->cols);
+    for (int i = 0; i < m->rows; i++) {
+        for (int j = 0; j < m->cols; j++) {
+            printf("%10.4f ", m->data[i][j]);
+        }
+        printf("\n");
+    }
+}
+
+void copyMatrix(Matrix *src, Matrix *dest) {
+    dest->rows = src->rows;
+    dest->cols = src->cols;
+    for (int i = 0; i < src->rows; i++) {
+        for (int j = 0; j < src->cols; j++) {
+            dest->data[i][j] = src->data[i][j];
+        }
+    }
+}
+
+void identityMatrix(Matrix *m, int n) {
+    m->rows = n;
+    m->cols = n;
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            m->data[i][j] = (i == j) ? 1.0 : 0.0;
+        }
+    }
+}
+
+/* Calculate determinant using Gaussian elimination */
+double determinant(Matrix *m) {
+    if (m->rows != m->cols) {
+        printf("Error: Matrix must be square to calculate determinant\n");
+        return 0.0;
+    }
+
+    Matrix temp;
+    copyMatrix(m, &temp);
+    double det = 1.0;
+
+    for (int i = 0; i < temp.rows; i++) {
+        /* Find pivot */
+        int pivot = i;
+        for (int j = i + 1; j < temp.rows; j++) {
+            if (fabs(temp.data[j][i]) > fabs(temp.data[pivot][i])) {
+                pivot = j;
+            }
+        }
+
+        if (fabs(temp.data[pivot][i]) < EPSILON) {
+            return 0.0; /* Singular matrix */
+        }
+
+        /* Swap rows if needed */
+        if (pivot != i) {
+            for (int j = 0; j < temp.cols; j++) {
+                double tmp = temp.data[i][j];
+                temp.data[i][j] = temp.data[pivot][j];
+                temp.data[pivot][j] = tmp;
+            }
+            det *= -1.0;
+        }
+
+        det *= temp.data[i][i];
+
+        /* Eliminate column */
+        for (int j = i + 1; j < temp.rows; j++) {
+            double factor = temp.data[j][i] / temp.data[i][i];
+            for (int k = i; k < temp.cols; k++) {
+                temp.data[j][k] -= factor * temp.data[i][k];
+            }
+        }
+    }
+
+    return det;
+}
+
+/* Check if matrix is invertible */
+int isInvertible(Matrix *m) {
+    double det = determinant(m);
+    printf("Determinant(A) = %.6f\n", det);
+    if (fabs(det) < EPSILON) {
+        printf("Matrix is NOT invertible (det = 0)\n");
+        return 0;
+    }
+    printf("Matrix IS invertible (det ≠ 0)\n");
+    return 1;
+}
+
+/* Matrix inversion using Gauss-Jordan elimination */
+int invertMatrix(Matrix *m, Matrix *inv) {
+    if (m->rows != m->cols) {
+        printf("Error: Matrix must be square\n");
+        return 0;
+    }
+
+    int n = m->rows;
+    Matrix augmented;
+    augmented.rows = n;
+    augmented.cols = 2 * n;
+
+    /* Create augmented matrix [A | I] */
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            augmented.data[i][j] = m->data[i][j];
+        }
+        for (int j = n; j < 2 * n; j++) {
+            augmented.data[i][j] = (j - n == i) ? 1.0 : 0.0;
+        }
+    }
+
+    /* Gauss-Jordan elimination */
+    for (int i = 0; i < n; i++) {
+        /* Find pivot */
+        int pivot = i;
+        for (int j = i + 1; j < n; j++) {
+            if (fabs(augmented.data[j][i]) > fabs(augmented.data[pivot][i])) {
+                pivot = j;
+            }
+        }
+
+        if (fabs(augmented.data[pivot][i]) < EPSILON) {
+            printf("Error: Matrix is singular\n");
+            return 0;
+        }
+
+        /* Swap rows */
+        if (pivot != i) {
+            for (int j = 0; j < 2 * n; j++) {
+                double tmp = augmented.data[i][j];
+                augmented.data[i][j] = augmented.data[pivot][j];
+                augmented.data[pivot][j] = tmp;
+            }
+        }
+
+        /* Normalize pivot row */
+        double pivot_val = augmented.data[i][i];
+        for (int j = 0; j < 2 * n; j++) {
+            augmented.data[i][j] /= pivot_val;
+        }
+
+        /* Eliminate column */
+        for (int j = 0; j < n; j++) {
+            if (j != i) {
+                double factor = augmented.data[j][i];
+                for (int k = 0; k < 2 * n; k++) {
+                    augmented.data[j][k] -= factor * augmented.data[i][k];
+                }
+            }
+        }
+    }
+
+    /* Extract inverse from augmented matrix */
+    inv->rows = n;
+    inv->cols = n;
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            inv->data[i][j] = augmented.data[i][j + n];
+        }
+    }
+
+    return 1;
+}
+
+/* Matrix multiplication: result = A * B */
+void multiplyMatrix(Matrix *A, Matrix *B, Matrix *result) {
+    if (A->cols != B->rows) {
+        printf("Error: Incompatible dimensions for multiplication\n");
+        return;
+    }
+
+    result->rows = A->rows;
+    result->cols = B->cols;
+
+    for (int i = 0; i < A->rows; i++) {
+        for (int j = 0; j < B->cols; j++) {
+            result->data[i][j] = 0.0;
+            for (int k = 0; k < A->cols; k++) {
+                result->data[i][j] += A->data[i][k] * B->data[k][j];
+            }
+        }
+    }
+}
+
+/* Subtract scalar * I from matrix: result = A - scalar * I */
+void subtractScalarIdentity(Matrix *A, double scalar, Matrix *result) {
+    copyMatrix(A, result);
+    for (int i = 0; i < A->rows; i++) {
+        result->data[i][i] -= scalar;
+    }
+}
+
+/* Power method to find dominant eigenvalue and eigenvector */
+int powerMethod(Matrix *A, double *eigenvalue, Matrix *eigenvector, int iterations) {
+    if (A->rows != A->cols) {
+        printf("Error: Matrix must be square\n");
+        return 0;
+    }
+
+    int n = A->rows;
+    
+    /* Initialize random eigenvector */
+    eigenvector->rows = n;
+    eigenvector->cols = 1;
+    for (int i = 0; i < n; i++) {
+        eigenvector->data[i][0] = 1.0; /* Start with [1, 1, ..., 1]^T */
+    }
+
+    Matrix Av;
+    Av.rows = n;
+    Av.cols = 1;
+
+    for (int iter = 0; iter < iterations; iter++) {
+        /* Av = A * v */
+        for (int i = 0; i < n; i++) {
+            Av.data[i][0] = 0.0;
+            for (int j = 0; j < n; j++) {
+                Av.data[i][0] += A->data[i][j] * eigenvector->data[j][0];
+            }
+        }
+
+        /* Find max element and eigenvalue estimate */
+        double max_val = 0.0;
+        int max_idx = 0;
+        for (int i = 0; i < n; i++) {
+            if (fabs(Av.data[i][0]) > fabs(max_val)) {
+                max_val = Av.data[i][0];
+                max_idx = i;
+            }
+        }
+
+        *eigenvalue = max_val;
+
+        /* Normalize */
+        for (int i = 0; i < n; i++) {
+            eigenvector->data[i][0] = Av.data[i][0] / max_val;
+        }
+    }
+
+    return 1;
+}
+
+/* Find trace of matrix (sum of diagonal elements) */
+double trace(Matrix *m) {
+    double sum = 0.0;
+    for (int i = 0; i < m->rows; i++) {
+        sum += m->data[i][i];
+    }
+    return sum;
+}
+
+/* Main diagonalization routine */
+void diagonalize(Matrix *A) {
+    printf("=== MATRIX DIAGONALIZATION ===\n");
+    printMatrix(A, "Matrix A");
+
+    /* Step 1: Check invertibility */
+    printf("\n--- Step 1: Check Invertibility ---\n");
+    if (!isInvertible(A)) {
+        printf("Cannot diagonalize non-invertible matrix\n");
+        return;
+    }
+
+    int n = A->rows;
+    
+    /* Step 2: Find eigenvalues (using power method - finds dominant eigenvalue) */
+    printf("\n--- Step 2: Find Eigenvalues and Eigenvectors ---\n");
+    printf("Note: Using Power Method for dominant eigenvalue\n");
+    
+    double eigenvalue = 0.0;
+    Matrix eigenvector;
+    powerMethod(A, &eigenvalue, &eigenvector, 100);
+    
+    printf("Dominant Eigenvalue λ = %.6f\n", eigenvalue);
+    printf("Corresponding Eigenvector:\n");
+    for (int i = 0; i < n; i++) {
+        printf("%10.6f\n", eigenvector.data[i][0]);
+    }
+
+    /* Verify: A*v = λ*v */
+    printf("\nVerification: A*v = λ*v\n");
+    Matrix Av;
+    Av.rows = n;
+    Av.cols = 1;
+    for (int i = 0; i < n; i++) {
+        Av.data[i][0] = 0.0;
+        for (int j = 0; j < n; j++) {
+            Av.data[i][0] += A->data[i][j] * eigenvector.data[j][0];
+        }
+    }
+    
+    printf("A*v:\n");
+    for (int i = 0; i < n; i++) {
+        printf("%10.6f\n", Av.data[i][0]);
+    }
+    printf("λ*v:\n");
+    for (int i = 0; i < n; i++) {
+        printf("%10.6f\n", eigenvalue * eigenvector.data[i][0]);
+    }
+
+    /* Step 3: Form matrices for diagonalization */
+    printf("\n--- Step 3: Form Diagonalization Matrices ---\n");
+    
+    /* Create diagonal matrix D with eigenvalue */
+    Matrix D;
+    identityMatrix(&D, n);
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            D.data[i][j] = (i == j) ? eigenvalue : 0.0;
+        }
+    }
+    printMatrix(&D, "Diagonal Matrix D");
+
+    /* Create matrix P from eigenvector */
+    Matrix P;
+    P.rows = n;
+    P.cols = n;
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            if (j == 0) {
+                P.data[i][j] = eigenvector.data[i][0];
+            } else {
+                /* For additional eigenvectors, would need more eigenvalues */
+                P.data[i][j] = (i == j) ? 1.0 : 0.0;
+            }
+        }
+    }
+    printMatrix(&P, "Matrix P (from eigenvectors)");
+
+    /* Step 4: Invert P */
+    printf("\n--- Step 4: Invert P ---\n");
+    Matrix P_inv;
+    if (!invertMatrix(&P, &P_inv)) {
+        printf("Error: Cannot invert P\n");
+        return;
+    }
+    printMatrix(&P_inv, "Matrix P^(-1)");
+
+    /* Step 5: Verify A = P*D*P^(-1) */
+    printf("\n--- Step 5: Verify Diagonalization A = P*D*P^(-1) ---\n");
+    Matrix PD, result;
+    multiplyMatrix(&P, &D, &PD);
+    multiplyMatrix(&PD, &P_inv, &result);
+    printMatrix(&result, "Result: P*D*P^(-1)");
+
+    printf("\nOriginal Matrix A:\n");
+    printMatrix(A, "A");
+
+    printf("\nDifference (should be near zero):\n");
+    double max_diff = 0.0;
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            double diff = fabs(A->data[i][j] - result.data[i][j]);
+            max_diff = (diff > max_diff) ? diff : max_diff;
+        }
+    }
+    printf("Maximum difference: %.2e\n", max_diff);
+
+    if (max_diff < 1e-6) {
+        printf("✓ Diagonalization successful: A = P*D*P^(-1)\n");
+    } else {
+        printf("✗ Diagonalization verification failed\n");
+    }
+}
+
+int main() {
+    Matrix A;
+
+    /* Example 1: Simple 2x2 diagonalizable matrix */
+    printf("╔════════════════════════════════════════╗\n");
+    printf("║   MATRIX DIAGONALIZATION IN C          ║\n");
+    printf("╚════════════════════════════════════════╝\n");
+
+    printf("\n>>> EXAMPLE 1: 2x2 Matrix <<<\n");
+    A.rows = 2;
+    A.cols = 2;
+    A.data[0][0] = 4;  A.data[0][1] = -2;
+    A.data[1][0] = 1;  A.data[1][1] = 1;
+    
+    diagonalize(&A);
+
+    /* Example 2: 3x3 matrix */
+    printf("\n\n>>> EXAMPLE 2: 3x3 Matrix <<<\n");
+    A.rows = 3;
+    A.cols = 3;
+    A.data[0][0] = 2;  A.data[0][1] = 0;  A.data[0][2] = 0;
+    A.data[1][0] = 0;  A.data[1][1] = 3;  A.data[1][2] = 0;
+    A.data[2][0] = 0;  A.data[2][1] = 0;  A.data[2][2] = 1;
+    
+    diagonalize(&A);
+
+    return 0;
 }
